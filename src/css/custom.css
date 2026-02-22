@@ -35,54 +35,31 @@
   color: #fff !important;
 }
 
-/* ── Urdu / RTL mode ─────────────────────────────────────────────────────────
-   Direction is driven by html[dir="rtl"] set in UrduContext.tsx.
-   body.urdu-mode is kept only for the Nastaliq font — direction is inherited
-   from the document root, not repeated here.
+/* ── Urdu mode ───────────────────────────────────────────────────────────────
+   Scoped entirely to body.urdu-mode — the document root dir is NEVER changed.
+   This keeps Docusaurus layout (sidebar, navbar, grid) in LTR at all times.
 ────────────────────────────────────────────────────────────────────────────── */
 
-/* Nastaliq font for article content when Urdu mode is active */
+/* RTL text + Nastaliq font inside doc articles only */
 body.urdu-mode article {
+  direction: rtl;
   font-family: 'Noto Nastaliq Urdu', serif;
-  text-align: end;
+  text-align: start;
 }
 
-/* Only hero needs an explicit direction reset — article content and
-   all other elements inherit direction from html[dir="rtl"] automatically.
-   Do NOT apply direction:rtl to .container or grid wrappers — those
-   are structural layout classes and flipping their direction breaks the
-   two-column doc layout grid. */
-html[dir="rtl"] .hero {
-  direction: rtl;
+/* Headings follow article direction */
+body.urdu-mode article h1,
+body.urdu-mode article h2,
+body.urdu-mode article h3,
+body.urdu-mode article h4 {
+  text-align: start;
 }
 
-/* Pin structural chrome to LTR — sidebar, navbar, TOC, and the doc/page
-   layout containers must never flip direction. */
-html[dir="rtl"] nav,
-html[dir="rtl"] .navbar,
-html[dir="rtl"] .theme-doc-sidebar-container,
-html[dir="rtl"] .table-of-contents,
-html[dir="rtl"] [class*="tableOfContents"],
-html[dir="rtl"] [class*="tocCollapsible"],
-html[dir="rtl"] [class*="docPage"],
-html[dir="rtl"] [class*="docRoot"],
-html[dir="rtl"] [class*="docsWrapper"],
-html[dir="rtl"] [class*="mainWrapper"] {
+/* Code blocks always stay LTR */
+body.urdu-mode article pre,
+body.urdu-mode article code {
   direction: ltr;
-  text-align: start;
-}
-
-/* Keep the main article text-align driven by urdu-mode class only,
-   not by inherited RTL direction on the layout wrapper. */
-html[dir="rtl"] article {
-  direction: rtl;
-  text-align: start;
-}
-
-/* Ensure centered section headers inside articles stay centered */
-html[dir="rtl"] article h2,
-html[dir="rtl"] article h3 {
-  text-align: start;
+  text-align: left;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */

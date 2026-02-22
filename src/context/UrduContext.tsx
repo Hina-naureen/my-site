@@ -33,15 +33,13 @@ export function UrduProvider({ children }: { children: React.ReactNode }): React
     });
   }, []);
 
-  // Sync document root dir/lang and body class whenever lang changes.
-  // This is what actually makes RTL work — without it the DOM root stays
-  // dir="ltr" / lang="en" regardless of React state.
+  // Toggle body class only — do NOT touch documentElement.dir.
+  // Setting dir="rtl" on <html> flips the entire Docusaurus layout
+  // (sidebar, navbar, grid). Urdu styling is scoped to article content
+  // via body.urdu-mode in custom.css.
   useEffect(() => {
     if (typeof document === 'undefined') return; // SSR guard
-    const isUrdu = lang === 'ur';
-    document.documentElement.dir  = isUrdu ? 'rtl' : 'ltr';
-    document.documentElement.lang = isUrdu ? 'ur'  : 'en';
-    document.body.classList.toggle('urdu-mode', isUrdu);
+    document.body.classList.toggle('urdu-mode', lang === 'ur');
   }, [lang]);
 
   return (

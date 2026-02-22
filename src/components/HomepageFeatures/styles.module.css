@@ -42,16 +42,13 @@
   gap: 1.5rem;
 }
 
-/* ── Feature Grid (responsive, RTL-safe) ───────────────────────────────── */
+/* ── Feature Grid ───────────────────────────────────────────────────────── */
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
   align-items: stretch;
-  /* Prevent html[dir=rtl] from collapsing or misaligning the grid */
-  direction: inherit;
-  text-align: start;
 }
 
 /* ── Icon Badge ──────────────────────────────────────────────────────────── */
@@ -211,16 +208,18 @@
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 
+@media (max-width: 996px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .section {
     padding: 3.5rem 1rem 4rem;
   }
 
   .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .featureGrid {
     grid-template-columns: 1fr;
   }
 }

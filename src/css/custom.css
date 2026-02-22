@@ -1,13 +1,11 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * GLOBAL CSS — FINAL CLEAN VERSION
  */
 
-/* ── Urdu / Nastaliq font ──────────────────────────────────────────────────── */
+/* ───────── Nastaliq Urdu Font ───────── */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
 
-/* You can override the default Infima variables here. */
+/* ───────── Theme Colors ───────── */
 :root {
   --ifm-color-primary: #2e8555;
   --ifm-color-primary-dark: #29784c;
@@ -17,73 +15,75 @@
   --ifm-color-primary-lighter: #359962;
   --ifm-color-primary-lightest: #3cad6e;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(0,0,0,0.1);
 }
 
-/* ── Navbar Sign Up button ─────────────────────────────────────────────────── */
+/* ───────── Navbar Button ───────── */
 .navbar-signup-btn {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
-  border-radius: 8px !important;
-  color: #fff !important;
-  padding: 0.35rem 0.9rem !important;
-  font-weight: 700 !important;
-  transition: opacity 0.18s !important;
+  background: linear-gradient(135deg,#4f46e5,#7c3aed);
+  border-radius: 8px;
+  color:#fff;
+  padding:.35rem .9rem;
+  font-weight:700;
+  transition:opacity .18s;
 }
 
 .navbar-signup-btn:hover {
-  opacity: 0.88 !important;
-  color: #fff !important;
+  opacity:.88;
+  color:#fff;
 }
 
-/* ── Urdu mode ───────────────────────────────────────────────────────────────
-   Scoped entirely to body.urdu-mode — the document root dir is NEVER changed.
-   This keeps Docusaurus layout (sidebar, navbar, grid) in LTR at all times.
-────────────────────────────────────────────────────────────────────────────── */
+/* ======================================================
+   ✅ URDU MODE — ENTERPRISE SAFE VERSION
+   IMPORTANT:
+   - html dir NEVER changes
+   - ONLY article text becomes RTL
+====================================================== */
 
-/* RTL text + Nastaliq font inside doc articles only */
+/* Urdu font + RTL direction only — no forced text-align so centered
+   headings and other elements keep their original alignment */
 body.urdu-mode article {
-  direction: rtl;
-  font-family: 'Noto Nastaliq Urdu', serif;
-  text-align: right;
+  font-family:'Noto Nastaliq Urdu', serif;
+  direction:rtl;
 }
 
-/* Headings follow article direction */
+/* Headings: unset any inherited alignment so they stay as designed */
 body.urdu-mode article h1,
 body.urdu-mode article h2,
 body.urdu-mode article h3,
 body.urdu-mode article h4 {
-  text-align: right;
+  text-align: unset;
 }
 
-/* Code blocks always stay LTR */
+/* code blocks always LTR */
 body.urdu-mode article pre,
 body.urdu-mode article code {
-  direction: ltr;
-  text-align: left;
+  direction:ltr;
+  text-align:left;
 }
 
-/* Layout chrome — force LTR regardless of urdu-mode.
-   These selectors are a safety net; the document root dir is never
-   changed (see UrduContext.tsx), so these only fire if something
-   else sets a direction on these elements. */
-body.urdu-mode .navbar,
+/* 🔒 FORCE LTR FOR LAYOUT STRUCTURE */
 body.urdu-mode nav,
+body.urdu-mode .navbar,
 body.urdu-mode .theme-doc-sidebar-container,
 body.urdu-mode .table-of-contents,
-body.urdu-mode [class*="tableOfContents"],
-body.urdu-mode [class*="tocCollapsible"] {
-  direction: ltr !important;
-  text-align: left !important;
+body.urdu-mode [class*="docPage"],
+body.urdu-mode [class*="docRoot"],
+body.urdu-mode [class*="docsWrapper"],
+body.urdu-mode [class*="mainWrapper"] {
+  direction:ltr !important;
+  text-align:left !important;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+
+/* ───────── Dark Mode ───────── */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary:#25c2a0;
+  --ifm-color-primary-dark:#21af90;
+  --ifm-color-primary-darker:#1fa588;
+  --ifm-color-primary-darkest:#1a8870;
+  --ifm-color-primary-light:#29d5b0;
+  --ifm-color-primary-lighter:#32d8b4;
+  --ifm-color-primary-lightest:#4fddbf;
+  --docusaurus-highlighted-code-line-bg:rgba(0,0,0,0.3);
 }

@@ -1,0 +1,38 @@
+---
+sidebar_position: 2
+title: Hackathon
+---
+
+# 🚀 Hackathon Project
+
+## 📌 Introduction
+This hackathon project is created using Docusaurus and TypeScript. The purpose of this project is to build a modern documentation website where information, tutorials, and project details can be presented in a clean and structured way. The website is fast, responsive, and easy to maintain.
+
+## 💡 Project Idea
+The main idea of this project is to create an interactive documentation platform for students and developers. It allows users to read tutorials, explore guides, and understand technical concepts through organized pages.
+
+## ⚙️ Technologies Used
+- Docusaurus
+- TypeScript
+- Node.js
+- Markdown
+- React
+
+## 🎯 Objectives
+- Create a simple and user-friendly documentation website.
+- Learn how to structure content using Markdown.
+- Understand how modern web frameworks work.
+- Build a project suitable for hackathon submission.
+
+## 🧩 Features
+- Clean navigation menu
+- Fast loading pages
+- Responsive design
+- Easy content editing
+- Local development server
+
+## 🚀 Future Improvements
+- Add custom design and themes
+- Include images and videos
+- Add more technical tutorials
+- Deploy the website online

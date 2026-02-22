@@ -1,0 +1,59 @@
+---
+sidebar_position: 3
+title: Chatbot
+---
+
+# 🤖 Project Assistant AI
+
+The floating **Project Assistant AI** widget appears on every page — look for the **chat button in the bottom-right corner**.
+
+It is a RAG-style assistant that answers questions sourced directly from this project's `docs/` folder.
+
+---
+
+## Try Asking
+
+- *"What is this project?"*
+- *"How do I deploy?"*
+- *"What is Docusaurus?"*
+- *"Show all features"*
+- *"How does the sidebar work?"*
+- *"How does this chatbot work?"*
+
+---
+
+## How It Works
+
+The widget is a React component injected globally via `src/theme/Root.tsx` — it renders on every page without touching the navbar or sidebar.
+
+**RAG implementation:**
+
+| Layer | Detail |
+|---|---|
+| Knowledge base | `DOC_ENTRIES` array — each entry maps keywords → an answer sourced from a real `docs/` file |
+| Matching | Score-based: multi-word keyword matches score higher than single-word matches |
+| Source attribution | Every bot response shows the originating doc file |
+| Suggestions | Quick-tap chips on first open for common questions |
+
+**Tech stack:**
+
+- `React useState` — message history, input, typing state, suggestion visibility
+- `React useRef` — auto-scroll to latest message, input focus on open
+- `CSS Modules` — scoped glassmorphism styling, `backdrop-filter` blur
+- `src/theme/Root.tsx` — Docusaurus Root swizzle for global injection
+
+---
+
+## Extending the Bot
+
+Add entries to the `DOC_ENTRIES` array in `src/components/ChatWidget/index.tsx`:
+
+```ts
+{
+  keywords: ['your', 'keywords', 'here'],
+  answer: 'Your concise answer sourced from the docs.',
+  source: 'docs/your-file.md',
+},
+```
+
+Each keyword is matched as a substring of the user's message (case-insensitive). Multi-word keywords rank higher than single-word ones.

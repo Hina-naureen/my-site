@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run start:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run serve:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(pip install:*)",
+      "Bash(python -c:*)",
+      "Bash(head:*)",
+      "Bash(true:*)",
+      "Bash(curl:*)",
+      "Bash(tail:*)",
+      "Bash(cd \"C:\\\\Users\\\\pc\\\\my-site\" && npx tsc --noEmit 2>&1)",
+      "Bash(cd \"C:/Users/pc/my-site/backend\" && python - << 'EOF'\nfrom langchain_core.documents import Document\nfrom rag.retriever import _rerank\n\ndef make_doc\\(path, title\\):\n    return Document\\(page_content=\"test\", metadata={\"path\": path, \"title\": title}\\)\n\n# Simulate: Nav2 query returns Glossary first, ROS2 second\ndocs = [\n    make_doc\\(\"docs/90-glossary.md\",          \"Glossary\"\\),\n    make_doc\\(\"docs/10-ros2-intro.md\",        \"Module 2 — ROS2\"\\),\n    make_doc\\(\"docs/20-gazebo.md\",            \"Module 3 — Simulation\"\\),\n    make_doc\\(\"docs/10-ros2-nav2.md\",         \"Nav2 Navigation Stack\"\\),\n]\n\nreranked = _rerank\\(docs, \"how does nav2 work\", k=4\\)\nprint\\(\"Nav2 query order:\"\\)\nfor d in reranked:\n    print\\(\" \", d.metadata[\"title\"]\\)\n\nprint\\(\\)\n\nreranked2 = _rerank\\(docs, \"define the term nav2 glossary\", k=4\\)\nprint\\(\"Glossary query order:\"\\)\nfor d in reranked2:\n    print\\(\" \", d.metadata[\"title\"]\\)\nEOF)",
+      "Bash(cd \"C:/Users/pc/my-site/backend\" && python -m rag.indexer 2>&1)"
+    ]
+  }
+}

@@ -143,7 +143,7 @@
 .modalClose {
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  inset-inline-end: 1rem;
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -336,4 +336,31 @@
 
 [data-theme='light'] .toolbarLabel {
   color: #4338ca;
+}
+
+/* ── RTL layout — driven by html[dir="rtl"] set in UrduContext ───────────── */
+
+/* Toolbar row reverses so label stays at inline-start, buttons at inline-end */
+:global(html[dir="rtl"]) .toolbar {
+  flex-direction: row-reverse;
+}
+
+/* Modal action row reverses (primary button stays at inline-start in RTL) */
+:global(html[dir="rtl"]) .modalActions {
+  flex-direction: row-reverse;
+}
+
+/* Goal tag row reverses to flow from inline-start */
+:global(html[dir="rtl"]) .goalTags {
+  flex-direction: row-reverse;
+}
+
+/* Close button already uses inset-inline-end — no override needed in RTL */
+
+/* Modal text: align to logical start */
+:global(html[dir="rtl"]) .modalTitle,
+:global(html[dir="rtl"]) .modalSubtitle,
+:global(html[dir="rtl"]) .profileCardLabel,
+:global(html[dir="rtl"]) .profileCardValue {
+  text-align: start;
 }

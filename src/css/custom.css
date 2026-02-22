@@ -44,7 +44,7 @@
 body.urdu-mode article {
   direction: rtl;
   font-family: 'Noto Nastaliq Urdu', serif;
-  text-align: start;
+  text-align: right;
 }
 
 /* Headings follow article direction */
@@ -52,7 +52,7 @@ body.urdu-mode article h1,
 body.urdu-mode article h2,
 body.urdu-mode article h3,
 body.urdu-mode article h4 {
-  text-align: start;
+  text-align: right;
 }
 
 /* Code blocks always stay LTR */
@@ -60,6 +60,20 @@ body.urdu-mode article pre,
 body.urdu-mode article code {
   direction: ltr;
   text-align: left;
+}
+
+/* Layout chrome — force LTR regardless of urdu-mode.
+   These selectors are a safety net; the document root dir is never
+   changed (see UrduContext.tsx), so these only fire if something
+   else sets a direction on these elements. */
+body.urdu-mode .navbar,
+body.urdu-mode nav,
+body.urdu-mode .theme-doc-sidebar-container,
+body.urdu-mode .table-of-contents,
+body.urdu-mode [class*="tableOfContents"],
+body.urdu-mode [class*="tocCollapsible"] {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */

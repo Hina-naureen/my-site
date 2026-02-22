@@ -343,17 +343,5 @@
   text-align: start;
 }
 
-/* ── RTL layout — driven by html[dir="rtl"] set in UrduContext ───────────── */
-/* flex-direction:row overrides are intentionally omitted: when html[dir="rtl"]
-   is set the browser already makes flex-row flow right→left, so adding
-   row-reverse would double-reverse back to LTR while keeping RTL text inside,
-   creating a broken mixed-direction result. Logical CSS properties (gap,
-   margin-inline-*, inset-inline-*) handle per-element alignment instead. */
-
-/* Modal text: align to logical start */
-:global(html[dir="rtl"]) .modalTitle,
-:global(html[dir="rtl"]) .modalSubtitle,
-:global(html[dir="rtl"]) .profileCardLabel,
-:global(html[dir="rtl"]) .profileCardValue {
-  text-align: start;
-}
+/* html[dir="rtl"] is never set (UrduContext uses body class only).
+   No global RTL overrides needed here. */

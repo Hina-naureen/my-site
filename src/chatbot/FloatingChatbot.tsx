@@ -12,4 +12,4 @@
  *  - Typewriter streaming, source citations, Urdu mode
  *  - Personalized greeting from auth context
  */
-export { default } from '@site/src/components/ChatWidget';
+export { default } from '@site/src/components/chatbot/FloatingChatbot';

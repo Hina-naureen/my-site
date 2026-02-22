@@ -1,7 +1,7 @@
 /**
- * UrduContext — global language toggle (en | ur).
- * Persists choice in localStorage. isTranslating is set by UrduTranslator
- * while the /api/translate call is in flight.
+ * UrduContext — global RTL layout toggle (en | ur).
+ * Persists the user's preference in localStorage.
+ * Urdu mode is a client-side RTL layout switch only — no API calls.
  */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
@@ -9,17 +9,14 @@ export type Lang = 'en' | 'ur';
 
 interface UrduContextValue {
   lang: Lang;
-  urduMode: boolean;          // convenience alias: lang === 'ur'
-  isTranslating: boolean;
-  setIsTranslating: (v: boolean) => void;
+  urduMode: boolean;   // convenience alias: lang === 'ur'
   toggleUrdu: () => void;
 }
 
 const UrduContext = createContext<UrduContextValue | null>(null);
 
-export function UrduProvider({ children }: { children: React.ReactNode }) {
+export function UrduProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
   const [lang, setLang] = useState<Lang>('en');
-  const [isTranslating, setIsTranslating] = useState(false);
 
   // Rehydrate from localStorage after mount (SSR-safe)
   useEffect(() => {
@@ -37,13 +34,7 @@ export function UrduProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <UrduContext.Provider value={{
-      lang,
-      urduMode: lang === 'ur',
-      isTranslating,
-      setIsTranslating,
-      toggleUrdu,
-    }}>
+    <UrduContext.Provider value={{ lang, urduMode: lang === 'ur', toggleUrdu }}>
       {children}
     </UrduContext.Provider>
   );

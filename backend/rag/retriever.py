@@ -1,71 +1,65 @@
 """
-RAG Retriever — TF-IDF based (no PyTorch / ONNX required).
-Uses scikit-learn cosine similarity for vector search.
-Uses OpenAI GPT-4o-mini for answer generation ONLY if OPENAI_API_KEY is set.
-Falls back to returning formatted retrieved context when no key is present.
+RAG Retriever — TF-IDF + local extractive synthesis (no paid API required).
 
-Singleton pattern: index is loaded once per process.
+Uses scikit-learn cosine similarity for retrieval.
+Uses extractive sentence scoring for answer synthesis — no OpenAI needed.
+If OPENAI_API_KEY is set it is used as an optional enhancement; the system
+works fully offline without it.
+
+Singleton pattern: index loaded once per process via lru_cache.
 
 Retrieval priority rules
 ------------------------
 1. Query is normalised to lowercase before search.
-2. If the query contains ROS2 / Nav2 keywords, documents whose path or title
-   contains ros2 / navigation hints are boosted (+2.0 per hint match).
-3. Glossary documents are suppressed (-1.5) unless the query explicitly asks
-   for a definition/term/meaning.
+2. ROS 2 / Nav2 queries boost documents whose path or title contains
+   matching hints (+2.0 per hint).
+3. Glossary documents are suppressed (-1.5) unless the query explicitly
+   asks for a definition.
 4. Re-ranking is applied after a wider initial fetch (k × 3 for routed
-   queries) so the final top-k reflects intent, not just TF-IDF similarity.
+   queries) so the final top-k reflects intent, not just TF-IDF score.
 """
 from __future__ import annotations
 
 import os
+import re
 import pickle
 from functools import lru_cache
 from pathlib import Path
 
-from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 
 load_dotenv()
 
-INDEX_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
+INDEX_DIR  = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
 INDEX_FILE = "tfidf_index.pkl"
 OPENAI_KEY = os.getenv("OPENAI_API_KEY", "")
 
+# ── Stop-word filter for keyword scoring ─────────────────────────────────────
 
-SYSTEM_PROMPT = PromptTemplate(
-    input_variables=["context", "question", "level"],
-    template="""You are an expert AI tutor for the "Physical AI & Humanoid Robotics" textbook.
-Use the context below to answer the question. Adjust your explanation depth for a {level} student.
+_STOP_WORDS: frozenset[str] = frozenset({
+    "what", "is", "are", "how", "does", "do", "the", "a", "an", "in",
+    "of", "to", "for", "and", "or", "can", "you", "me", "tell", "explain",
+    "describe", "about", "it", "its", "this", "that", "these", "those",
+    "with", "on", "at", "by", "from", "as", "be", "was", "were", "will",
+    "would", "could", "should", "have", "has", "had", "not", "but", "also",
+    "i", "my", "we", "our", "your", "which", "when", "where", "who",
+    "give", "get", "let", "please", "want", "need", "know", "like",
+})
 
-Context:
-{context}
-
-Question: {question}
-
-Answer concisely with clear structure. If relevant, mention which chapter/module the topic is from.
-If you cannot answer from the context, say so honestly.
-""",
-)
-
-
-# ── Keyword routing tables ──────────────────────────────────────────────────
+# ── Keyword routing tables ────────────────────────────────────────────────────
 
 _MODULE2_QUERY_KW = {
     "nav2", "ros2", "ros 2", "navigation", "planner", "controller",
     "node", "topic", "service", "action server", "lifecycle",
 }
-
-_MODULE2_DOC_HINTS = {"ros2", "ros-2", "ros_2", "navigation", "nav2", "nav-2"}
-
-_GLOSSARY_QUERY_KW = {"define", "definition", "term", "meaning", "glossary", "what does", "what is a"}
-
+_MODULE2_DOC_HINTS  = {"ros2", "ros-2", "ros_2", "navigation", "nav2", "nav-2"}
+_GLOSSARY_QUERY_KW  = {"define", "definition", "term", "meaning", "glossary", "what does", "what is a"}
 _GLOSSARY_DOC_HINTS = {"glossary", "terms", "definitions"}
 
 
-# ── Re-ranking helpers ──────────────────────────────────────────────────────
+# ── Re-ranking ────────────────────────────────────────────────────────────────
 
 def _doc_hint_match(doc: Document, hints: set[str]) -> bool:
     path  = doc.metadata.get("path",  "").lower()
@@ -83,44 +77,90 @@ def _rerank(docs: list[Document], query_lower: str, k: int) -> list[Document]:
     scored: list[tuple[float, Document]] = []
     for i, doc in enumerate(docs):
         score = float(len(docs) - i)
-
         if boost_module2 and _doc_hint_match(doc, _MODULE2_DOC_HINTS):
             score += 2.0
-
         if suppress_glossary and _doc_hint_match(doc, _GLOSSARY_DOC_HINTS):
             score -= 1.5
-
         scored.append((score, doc))
 
     scored.sort(key=lambda x: x[0], reverse=True)
     return [doc for _, doc in scored[:k]]
 
 
-# ── Free-mode answer formatter ──────────────────────────────────────────────
+# ── Local extractive synthesiser (no API required) ────────────────────────────
 
-def _format_context_answer(context: str, query: str, level: str) -> str:
-    chunks = [c.strip() for c in context.split("---") if c.strip()]
-    parts = ["**From the Physical AI & Humanoid Robotics textbook:**\n"]
-
-    for chunk in chunks[:2]:
-        if chunk:
-            parts.append(chunk[:600])
-
-    if not chunks:
-        parts.append("No relevant content found for your query. Try rephrasing.")
-
-    parts.append(
-        "\n_Tip: Add `OPENAI_API_KEY` to `backend/.env` for AI-synthesized answers._"
-    )
-    return "\n\n".join(parts)
+def _content_words(text: str) -> set[str]:
+    """Tokenise text and remove stop words."""
+    return {
+        w for w in re.sub(r"[^\w\s]", "", text.lower()).split()
+        if w not in _STOP_WORDS and len(w) > 2
+    }
 
 
-# ── TF-IDF index singleton ──────────────────────────────────────────────────
+def _local_synthesize(docs: list[Document], query: str, level: str) -> str:
+    """
+    Extractive answer synthesis from retrieved documents.
+    Scores each paragraph/sentence by content-word overlap with the query,
+    then assembles the top results into a structured response.
+    Pure Python — no external API required.
+    """
+    q_words = _content_words(query)
+
+    sections: list[str] = []
+    seen_keys: set[str] = set()
+
+    for doc in docs[:4]:
+        text  = doc.page_content
+        title = doc.metadata.get("title", "Reference")
+
+        # Split into paragraphs, then sentences as fallback
+        raw_parts = re.split(r"\n{2,}|(?<=[.!?])\s+(?=[A-Z\d])", text)
+        parts = [p.strip() for p in raw_parts if len(p.strip()) > 30]
+
+        # Score each part by query keyword overlap
+        scored: list[tuple[int, str]] = [
+            (len(q_words & _content_words(part)), part)
+            for part in parts
+        ]
+        scored.sort(key=lambda x: -x[0])
+
+        # Collect up to 2 unique parts per document
+        top: list[str] = []
+        for score, part in scored:
+            if len(top) >= 2:
+                break
+            key = part[:60].lower()
+            if key not in seen_keys:
+                seen_keys.add(key)
+                top.append(part)
+
+        if top:
+            sections.append(f"**{title}**\n\n" + "\n\n".join(top))
+
+    # Fallback: return raw excerpt from first doc
+    if not sections:
+        if docs:
+            d = docs[0]
+            excerpt = d.page_content[:450].rstrip()
+            return f"**{d.metadata.get('title', 'Reference')}**\n\n{excerpt}"
+        return "No relevant content found in the textbook for this query."
+
+    level_intro = {
+        "beginner":     "Here is a clear explanation",
+        "intermediate": "Here is what the textbook covers",
+        "expert":       "Technical reference from the textbook",
+    }.get(level, "Here is what the textbook covers")
+
+    header = f"{level_intro} on **{query.strip()}**:\n\n"
+    return header + "\n\n---\n\n".join(sections)
+
+
+# ── TF-IDF index singleton ────────────────────────────────────────────────────
 
 @lru_cache(maxsize=1)
 def _load_index() -> dict:
-    index_path = os.path.join(INDEX_DIR, INDEX_FILE)
-    if not Path(index_path).exists():
+    index_path = Path(INDEX_DIR) / INDEX_FILE
+    if not index_path.exists():
         raise RuntimeError(
             "TF-IDF index not found. Run `python -m rag.indexer` first."
         )
@@ -129,24 +169,24 @@ def _load_index() -> dict:
 
 
 def _search(query: str, fetch_k: int) -> list[Document]:
-    idx = _load_index()
-    vectorizer = idx["vectorizer"]
+    idx          = _load_index()
+    vectorizer   = idx["vectorizer"]
     tfidf_matrix = idx["tfidf_matrix"]
-    texts = idx["texts"]
-    metadatas = idx["metadatas"]
+    texts        = idx["texts"]
+    metadatas    = idx["metadatas"]
 
-    q_vec = vectorizer.transform([query])
+    q_vec  = vectorizer.transform([query])
     scores = cosine_similarity(q_vec, tfidf_matrix).flatten()
 
     top_indices = scores.argsort()[::-1][:fetch_k]
-    docs = []
-    for i in top_indices:
-        if scores[i] > 0:
-            docs.append(Document(page_content=texts[i], metadata=metadatas[i]))
-    return docs
+    return [
+        Document(page_content=texts[i], metadata=metadatas[i])
+        for i in top_indices
+        if scores[i] > 0
+    ]
 
 
-# ── Public interface ────────────────────────────────────────────────────────
+# ── Public interface ──────────────────────────────────────────────────────────
 
 def retrieve_answer(
     query: str,
@@ -156,7 +196,11 @@ def retrieve_answer(
     k: int = 4,
 ) -> dict:
     """
-    Retrieve relevant chunks and generate an answer.
+    Retrieve relevant chunks from the local TF-IDF index and synthesise
+    an answer using extractive QA (no paid API required).
+
+    If OPENAI_API_KEY is present in the environment it is used for
+    higher-quality answer synthesis; otherwise the local synthesiser runs.
 
     Returns:
         {"answer": str, "sources": list[dict], "mode": "rag"}
@@ -169,44 +213,39 @@ def retrieve_answer(
     raw_docs = _search(query, fetch_k)
     docs     = _rerank(raw_docs, query_lower, k)
 
-    context = "\n\n---\n\n".join(
-        [f"[{d.metadata.get('title', 'Doc')}]\n{d.page_content}" for d in docs]
-    )
-
-    # ── Answer generation ───────────────────────────────────────────────────
+    # ── Answer synthesis ─────────────────────────────────────────────────────
     if OPENAI_KEY:
-        from langchain_openai import ChatOpenAI
+        # Optional: use OpenAI for higher-quality synthesis
+        try:
+            from langchain_openai import ChatOpenAI
+            from langchain_core.prompts import PromptTemplate
 
-        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2, streaming=False)
-
-        messages = [
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT.format(
-                    context=context,
-                    question=query,
-                    level=user_level,
-                ),
-            }
-        ]
-
-        if history:
-            messages.extend(history[-6:])
-
-        messages.append({"role": "user", "content": query})
-
-        if language and language != "en":
-            messages.append(
-                {
-                    "role": "user",
-                    "content": f"Please translate your final answer to {language}.",
-                }
+            context = "\n\n---\n\n".join(
+                f"[{d.metadata.get('title', 'Doc')}]\n{d.page_content}"
+                for d in docs
             )
 
-        response = llm.invoke(messages)
-        answer   = response.content
+            system_prompt = (
+                "You are an expert AI tutor for the 'Physical AI & Humanoid Robotics' textbook.\n"
+                "Use the context below to answer the question. "
+                f"Adjust depth for a {user_level} student.\n\n"
+                f"Context:\n{context}\n\n"
+                "Answer concisely with clear structure. "
+                "If you cannot answer from the context, say so honestly."
+            )
+
+            messages = [{"role": "system", "content": system_prompt}]
+            if history:
+                messages.extend(history[-6:])
+            messages.append({"role": "user", "content": query})
+
+            llm    = ChatOpenAI(model="gpt-4o-mini", temperature=0.2, streaming=False)
+            answer = llm.invoke(messages).content
+        except Exception:
+            # Graceful fallback if OpenAI call fails
+            answer = _local_synthesize(docs, query, user_level)
     else:
-        answer = _format_context_answer(context, query, user_level)
+        answer = _local_synthesize(docs, query, user_level)
 
     sources = [
         {

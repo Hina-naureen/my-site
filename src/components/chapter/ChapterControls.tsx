@@ -1,6 +1,6 @@
 /**
- * Chapter Controls toolbar — appears at the top of every doc page.
- * Renders PersonalizeButton (auth-gated, AI-powered) and the Urdu toggle.
+ * ChapterControls — toolbar injected at the top of every doc page.
+ * Renders the Personalize button (auth-gated) and the RTL layout toggle.
  */
 import React from 'react';
 import { useAuth } from '@site/src/components/auth/AuthContext';
@@ -12,17 +12,18 @@ import styles from './styles.module.css';
 
 function IconTranslate() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 5h12M9 3v2m0 0c0 4-2.5 7-6 8m6-8c0 4 2.5 7 6 8" />
       <path d="M11 17l2-5 2 5m-3.5-2h3" />
-      <path d="M19 17h2m-2 0l-3-5 3 5Z" />
     </svg>
   );
 }
 
 function IconCheck() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 6L9 17l-5-5" />
     </svg>
   );
@@ -31,16 +32,16 @@ function IconCheck() {
 // ── Level badge colours ────────────────────────────────────────────────────
 
 const LEVEL_COLORS: Record<string, string> = {
-  beginner: '#22c55e',
+  beginner:     '#22c55e',
   intermediate: '#f59e0b',
-  expert: '#ef4444',
+  expert:       '#ef4444',
 };
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function ChapterControls() {
+export default function ChapterControls(): React.JSX.Element {
   const { user } = useAuth();
-  const { urduMode, isTranslating, toggleUrdu } = useUrdu();
+  const { urduMode, toggleUrdu } = useUrdu();
 
   return (
     <>
@@ -72,24 +73,21 @@ export default function ChapterControls() {
         <button
           className={`${styles.btn} ${styles.btnTranslate} ${urduMode ? styles.btnTranslateActive : ''}`}
           onClick={toggleUrdu}
-          disabled={isTranslating}
-          aria-label="Translate to Urdu"
+          aria-label="Toggle RTL layout"
           aria-pressed={urduMode}
-          title="Toggle Urdu translation"
+          title="Toggle Urdu RTL layout"
         >
-          {isTranslating ? (
-            <><div className={styles.spinner} /> Translating…</>
-          ) : urduMode ? (
+          {urduMode ? (
             <><IconCheck /> اردو — On</>
           ) : (
-            <><IconTranslate /> Translate to Urdu</>
+            <><IconTranslate /> Urdu RTL</>
           )}
         </button>
       </div>
 
       {urduMode && (
         <div className={styles.urduBanner}>
-          🌐 یہ باب اردو ترجمے کے ساتھ پڑھ رہے ہیں — چیٹ باٹ سے اردو میں سوالات پوچھیں
+          ↔ RTL layout active — reading right to left &nbsp;·&nbsp; اردو لے آؤٹ فعال ہے
         </div>
       )}
     </>

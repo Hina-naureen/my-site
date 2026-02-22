@@ -39,6 +39,33 @@
   gap: 1.5rem;
 }
 
+/* ── Feature Grid (3-column hero row) ───────────────────────────────────── */
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+@media (max-width: 960px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Icon Badge ──────────────────────────────────────────────────────────── */
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  margin-bottom: 0.25rem;
+}
+
 /* ── Card ────────────────────────────────────────────────────────────────── */
 
 .card {

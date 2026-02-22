@@ -338,6 +338,14 @@
   color: #4338ca;
 }
 
+/* ── RTL status badge ─────────────────────────────────────────────────────── */
+.rtlStatus {
+  text-align: start;
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+  display: inline-flex;
+}
+
 /* ── RTL layout — driven by html[dir="rtl"] set in UrduContext ───────────── */
 
 /* Toolbar row reverses so label stays at inline-start, buttons at inline-end */

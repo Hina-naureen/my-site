@@ -7,6 +7,7 @@
   padding: 6rem 1.5rem 5rem;
   text-align: center;
   overflow: hidden;
+  isolation: isolate;
   background:
     radial-gradient(ellipse 80% 60% at 50% -10%, rgba(22, 163, 74, 0.22) 0%, transparent 70%),
     linear-gradient(160deg, #071a0f 0%, #0b2616 35%, #06180d 65%, #051208 100%);
@@ -24,7 +25,9 @@
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
-  animation: orbFloat 8s ease-in-out infinite;
+  z-index: 0;
+  will-change: transform;
+  animation: orbFloat1 8s ease-in-out infinite;
 }
 
 .orb2 {
@@ -36,12 +39,21 @@
   bottom: -100px;
   right: 10%;
   pointer-events: none;
-  animation: orbFloat 12s ease-in-out infinite reverse;
+  z-index: 0;
+  will-change: transform;
+  animation: orbFloat2 12s ease-in-out infinite;
 }
 
-@keyframes orbFloat {
+/* orb1 — centered via translateX(-50%), drifts vertically */
+@keyframes orbFloat1 {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50%       { transform: translateX(-50%) translateY(-20px); }
+}
+
+/* orb2 — right-anchored, drifts vertically only */
+@keyframes orbFloat2 {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-20px); }
 }
 
 /* Subtle grid overlay */
@@ -53,12 +65,13 @@
     linear-gradient(90deg, rgba(22, 163, 74, 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
   pointer-events: none;
+  z-index: 0;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
 }
 
 .heroInner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 860px;
   margin: 0 auto;
   display: flex;
@@ -171,6 +184,9 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
 }
 
 .ctaPrimary {

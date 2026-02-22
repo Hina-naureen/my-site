@@ -286,7 +286,8 @@
 .urduBanner {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
   padding: 0.6rem 1rem;
   background: rgba(14, 165, 233, 0.1);
   border: 1px solid rgba(14, 165, 233, 0.25);
@@ -297,6 +298,12 @@
   font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
   direction: rtl;
   line-height: 1.9;
+  /* prevent overflow on narrow viewports */
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* ── Dark mode overrides ──────────────────────────────────────────────────── */

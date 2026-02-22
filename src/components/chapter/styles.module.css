@@ -18,7 +18,7 @@
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: #6366f1;
-  margin-right: 0.2rem;
+  margin-inline-end: 0.2rem;
   white-space: nowrap;
 }
 

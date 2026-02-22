@@ -35,22 +35,34 @@
   color: #fff !important;
 }
 
-/* ── Urdu mode — RTL scoped to article only ────────────────────────────────── */
+/* ── Urdu / RTL mode ─────────────────────────────────────────────────────────
+   Direction is driven by html[dir="rtl"] set in UrduContext.tsx.
+   body.urdu-mode is kept only for the Nastaliq font — direction is inherited
+   from the document root, not repeated here.
+────────────────────────────────────────────────────────────────────────────── */
+
+/* Nastaliq font for article content when Urdu mode is active */
 body.urdu-mode article {
-  direction: rtl;
-  text-align: right;
   font-family: 'Noto Nastaliq Urdu', serif;
+  text-align: end;
 }
 
-/* Keep sidebar, navbar, and TOC strictly LTR */
-body.urdu-mode nav,
-body.urdu-mode .navbar,
-body.urdu-mode .theme-doc-sidebar-container,
-body.urdu-mode .table-of-contents,
-body.urdu-mode [class*="tableOfContents"],
-body.urdu-mode [class*="tocCollapsible"] {
-  direction: ltr !important;
-  text-align: left !important;
+/* Hero, generic containers, and grid wrappers follow document direction */
+html[dir="rtl"] .hero,
+html[dir="rtl"] .container,
+html[dir="rtl"] [class*="grid"] {
+  direction: rtl;
+}
+
+/* Pin structural chrome to LTR — sidebar, navbar, and TOC must never flip */
+html[dir="rtl"] nav,
+html[dir="rtl"] .navbar,
+html[dir="rtl"] .theme-doc-sidebar-container,
+html[dir="rtl"] .table-of-contents,
+html[dir="rtl"] [class*="tableOfContents"],
+html[dir="rtl"] [class*="tocCollapsible"] {
+  direction: ltr;
+  text-align: start;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */

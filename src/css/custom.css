@@ -56,14 +56,32 @@ html[dir="rtl"] .hero {
   direction: rtl;
 }
 
-/* Pin structural chrome to LTR — sidebar, navbar, and TOC must never flip */
+/* Pin structural chrome to LTR — sidebar, navbar, TOC, and the doc/page
+   layout containers must never flip direction. */
 html[dir="rtl"] nav,
 html[dir="rtl"] .navbar,
 html[dir="rtl"] .theme-doc-sidebar-container,
 html[dir="rtl"] .table-of-contents,
 html[dir="rtl"] [class*="tableOfContents"],
-html[dir="rtl"] [class*="tocCollapsible"] {
+html[dir="rtl"] [class*="tocCollapsible"],
+html[dir="rtl"] [class*="docPage"],
+html[dir="rtl"] [class*="docRoot"],
+html[dir="rtl"] [class*="docsWrapper"],
+html[dir="rtl"] [class*="mainWrapper"] {
   direction: ltr;
+  text-align: start;
+}
+
+/* Keep the main article text-align driven by urdu-mode class only,
+   not by inherited RTL direction on the layout wrapper. */
+html[dir="rtl"] article {
+  direction: rtl;
+  text-align: start;
+}
+
+/* Ensure centered section headers inside articles stay centered */
+html[dir="rtl"] article h2,
+html[dir="rtl"] article h3 {
   text-align: start;
 }
 

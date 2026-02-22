@@ -3,9 +3,12 @@
 ═══════════════════════════════════════════════════ */
 
 .section {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   padding: 5rem 1.5rem 6rem;
   max-width: 1200px;
-  margin: 0 auto;
+  margin-inline: auto;
 }
 
 /* ── Section header ──────────────────────────────────────────────────────── */
@@ -39,18 +42,16 @@
   gap: 1.5rem;
 }
 
-/* ── Feature Grid (3-column hero row) ───────────────────────────────────── */
+/* ── Feature Grid (responsive, RTL-safe) ───────────────────────────────── */
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.75rem;
-}
-
-@media (max-width: 960px) {
-  .featureGrid {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  align-items: stretch;
+  /* Prevent html[dir=rtl] from collapsing or misaligning the grid */
+  direction: inherit;
+  text-align: start;
 }
 
 /* ── Icon Badge ──────────────────────────────────────────────────────────── */
@@ -216,6 +217,10 @@
   }
 
   .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .featureGrid {
     grid-template-columns: 1fr;
   }
 }

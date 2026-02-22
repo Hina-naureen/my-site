@@ -68,7 +68,6 @@
 
 .btnTranslate:hover {
   box-shadow: 0 4px 20px rgba(14, 165, 233, 0.45);
-  transform: translateY(-1px);
 }
 
 .btnTranslateActive {
@@ -100,7 +99,6 @@
 
 .btnPersonalize:hover {
   box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
-  transform: translateY(-1px);
 }
 
 
@@ -339,31 +337,18 @@
 }
 
 /* ── RTL status badge ─────────────────────────────────────────────────────── */
+/* Only set logical text alignment — do NOT override display or margins here.
+   The .urduBanner sets display:flex and must remain block-level. */
 .rtlStatus {
   text-align: start;
-  margin-inline-start: auto;
-  margin-inline-end: 0;
-  display: inline-flex;
 }
 
 /* ── RTL layout — driven by html[dir="rtl"] set in UrduContext ───────────── */
-
-/* Toolbar row reverses so label stays at inline-start, buttons at inline-end */
-:global(html[dir="rtl"]) .toolbar {
-  flex-direction: row-reverse;
-}
-
-/* Modal action row reverses (primary button stays at inline-start in RTL) */
-:global(html[dir="rtl"]) .modalActions {
-  flex-direction: row-reverse;
-}
-
-/* Goal tag row reverses to flow from inline-start */
-:global(html[dir="rtl"]) .goalTags {
-  flex-direction: row-reverse;
-}
-
-/* Close button already uses inset-inline-end — no override needed in RTL */
+/* flex-direction:row overrides are intentionally omitted: when html[dir="rtl"]
+   is set the browser already makes flex-row flow right→left, so adding
+   row-reverse would double-reverse back to LTR while keeping RTL text inside,
+   creating a broken mixed-direction result. Logical CSS properties (gap,
+   margin-inline-*, inset-inline-*) handle per-element alignment instead. */
 
 /* Modal text: align to logical start */
 :global(html[dir="rtl"]) .modalTitle,

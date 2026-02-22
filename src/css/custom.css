@@ -47,10 +47,12 @@ body.urdu-mode article {
   text-align: end;
 }
 
-/* Hero, generic containers, and grid wrappers follow document direction */
-html[dir="rtl"] .hero,
-html[dir="rtl"] .container,
-html[dir="rtl"] [class*="grid"] {
+/* Only hero needs an explicit direction reset — article content and
+   all other elements inherit direction from html[dir="rtl"] automatically.
+   Do NOT apply direction:rtl to .container or grid wrappers — those
+   are structural layout classes and flipping their direction breaks the
+   two-column doc layout grid. */
+html[dir="rtl"] .hero {
   direction: rtl;
 }
 

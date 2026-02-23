@@ -6,6 +6,7 @@
  * Only rendered when the user is logged in.
  */
 import React, { useState } from 'react';
+import Link from '@docusaurus/Link';
 import { useAuth } from '@site/src/components/auth/AuthContext';
 import styles from './PersonalizeButton.module.css';
 
@@ -62,12 +63,27 @@ function buildTip(user: UserProfile, chapterTitle: string): string {
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-export default function PersonalizeButton(): React.JSX.Element | null {
-  const { user, token } = useAuth();
-  const [isOpen, setIsOpen]   = useState(false);
+export default function PersonalizeButton(): React.JSX.Element {
+  const { user, token, isLoading } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Auth gate — hidden when logged out
-  if (!token || !user) return null;
+  // During SSR/hydration — show placeholder to avoid mismatch
+  if (isLoading) {
+    return (
+      <button className={styles.btn} disabled style={{ opacity: 0.4, cursor: 'default' }}>
+        ✨ Personalize
+      </button>
+    );
+  }
+
+  // Not logged in — show sign-in prompt button
+  if (!token || !user) {
+    return (
+      <Link to="/login" className={styles.btn} style={{ textDecoration: 'none', opacity: 0.75 }}>
+        ✨ Personalize
+      </Link>
+    );
+  }
 
   const chapterTitle =
     typeof document !== 'undefined'

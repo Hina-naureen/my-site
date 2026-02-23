@@ -89,7 +89,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || 'Login failed');
+      const msg = res.status === 404
+        ? 'Server is starting up, please try again in a moment.'
+        : (err.detail || 'Login failed');
+      throw new Error(msg);
     }
     handleAuthResponse(await res.json());
   }, [handleAuthResponse]);
@@ -102,7 +105,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || 'Signup failed');
+      const msg = res.status === 404
+        ? 'Server is starting up, please try again in a moment.'
+        : (err.detail || 'Signup failed');
+      throw new Error(msg);
     }
     handleAuthResponse(await res.json());
   }, [handleAuthResponse]);

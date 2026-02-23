@@ -1,6 +1,8 @@
 /* ── Personalize Button ──────────────────────────────────────────────────── */
 .wrap {
   position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .btn {

@@ -10,6 +10,8 @@
   border: 1px solid rgba(99, 102, 241, 0.18);
   border-radius: 14px;
   backdrop-filter: blur(6px);
+  /* Prevent RTL inheritance (body.urdu-mode article) from reversing the flex row */
+  direction: ltr;
 }
 
 .toolbarLabel {

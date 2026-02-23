@@ -4,14 +4,15 @@
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
-  padding: 0.7rem 1rem;
+  padding: 0.6rem 1rem;
+  min-height: 3rem;          /* prevent CLS on load */
   margin-bottom: 1.5rem;
   background: rgba(99, 102, 241, 0.06);
   border: 1px solid rgba(99, 102, 241, 0.18);
   border-radius: 14px;
   backdrop-filter: blur(6px);
-  /* Prevent RTL inheritance (body.urdu-mode article) from reversing the flex row */
-  direction: ltr;
+  direction: ltr;             /* prevent RTL inheritance from urdu-mode */
+  contain: layout style;      /* performance: isolate reflow */
 }
 
 .toolbarLabel {
@@ -34,12 +35,14 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.5rem 1rem;
+  height: 2.1rem;            /* lock height — matches PersonalizeButton */
   border-radius: 10px;
   font-size: 0.82rem;
   font-weight: 600;
+  line-height: 1;
   border: none;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
   white-space: nowrap;
   position: relative;
   overflow: hidden;

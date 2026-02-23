@@ -19,6 +19,12 @@
   box-shadow:
     0 0 0 1px rgba(99, 102, 241, 0.12),
     0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: cardIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
 .authLogo {
@@ -150,19 +156,22 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
   box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
   letter-spacing: 0.01em;
 }
 
 .submitBtn:hover:not(:disabled) {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(99, 102, 241, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.6);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .submitBtn:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 

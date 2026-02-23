@@ -16,6 +16,11 @@
   --ifm-color-primary-lightest: #3cad6e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0,0,0,0.1);
+
+  /* PhysAI brand tokens */
+  --physai-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
+  --physai-glow: 0 4px 22px rgba(99, 102, 241, 0.55);
+  --physai-border: rgba(99, 102, 241, 0.22);
 }
 
 /* ───────── Navbar Button ───────── */
@@ -75,6 +80,11 @@ body.urdu-mode [class*="mainWrapper"] {
   text-align:left !important;
 }
 
+
+/* ───────── Light mode auth page override ───────── */
+[data-theme='light'] .navbar-signup-btn {
+  color: #fff !important;
+}
 
 /* ───────── Dark Mode ───────── */
 [data-theme='dark'] {

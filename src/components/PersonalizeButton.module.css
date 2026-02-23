@@ -9,22 +9,28 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.52rem 1.1rem;
+  padding: 0.5rem 1rem;
+  height: 2.1rem;            /* matches ChapterControls .btn */
   border-radius: 10px;
-  font-size: 0.83rem;
+  font-size: 0.82rem;
   font-weight: 700;
+  line-height: 1;
   border: none;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
   white-space: nowrap;
   background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
   color: #fff;
   box-shadow: 0 2px 12px rgba(99, 102, 241, 0.35);
   letter-spacing: 0.01em;
+  text-decoration: none;     /* for <Link> variant */
 }
 
 .btn:hover {
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 4px 22px rgba(99, 102, 241, 0.55);
+  transform: translateY(-1px);
+  color: #fff;
+  text-decoration: none;
 }
 
 .btn:active {

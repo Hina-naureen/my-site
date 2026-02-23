@@ -33,7 +33,9 @@ type ConnStatus = 'checking' | 'online' | 'offline';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const API_URL = 'http://localhost:8000/api/chat';
+import { BACKEND_URL } from '@site/src/apiConfig';
+
+const API_URL = `${BACKEND_URL}/api/chat`;
 
 const SUGGESTIONS_EN = [
   'What is Physical AI?',
@@ -200,7 +202,7 @@ export default function FloatingChatbot(): React.JSX.Element {
   // Probe backend
   useEffect(() => {
     let cancelled = false;
-    fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(3000) })
+    fetch(`${BACKEND_URL}/health`, { signal: AbortSignal.timeout(3000) })
       .then(r => { if (!cancelled) setConnStatus(r.ok ? 'online' : 'offline'); })
       .catch(() => { if (!cancelled) setConnStatus('offline'); });
     return () => { cancelled = true; };

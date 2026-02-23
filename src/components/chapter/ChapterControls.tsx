@@ -86,9 +86,9 @@ export default function ChapterControls(): React.JSX.Element {
       </div>
 
       {urduMode && (
-        <div className={styles.urduBanner}>
-          ↔ RTL layout active — reading right to left &nbsp;·&nbsp; اردو لے آؤٹ فعال ہے
-        </div>
+        <div className={`${styles.urduBanner} ${styles.rtlStatus}`}>
+  ⚡ اردو موڈ فعال — متن دائیں سے بائیں پڑھا جا رہا ہے
+</div>
       )}
     </>
   );

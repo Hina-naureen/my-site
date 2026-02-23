@@ -159,6 +159,7 @@ export default function FloatingChatbot(): React.JSX.Element {
   const [connStatus, setConnStatus] = useState<ConnStatus>('checking');
   const [history, setHistory] = useState<{ role: string; content: string }[]>([]);
   const [urduMode, setUrduMode] = useState(false);
+  const [pendingQuery, setPendingQuery] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -168,6 +169,20 @@ export default function FloatingChatbot(): React.JSX.Element {
 
   // Keep ref in sync
   useEffect(() => { isOpenRef.current = isOpen; }, [isOpen]);
+
+  // Listen for selected-text "Ask AI" events from TextSelectionPopup
+  useEffect(() => {
+    function handleAskAbout(e: Event) {
+      const { text } = (e as CustomEvent<{ text: string }>).detail;
+      const truncated = text.length > 400 ? text.slice(0, 400) + '…' : text;
+      const question = `I selected this text from the textbook:\n\n"${truncated}"\n\nCan you explain this in detail?`;
+      setIsOpen(true);
+      setShowSuggestions(false);
+      setPendingQuery(question);
+    }
+    window.addEventListener('physai:askabout', handleAskAbout);
+    return () => window.removeEventListener('physai:askabout', handleAskAbout);
+  }, []);
 
   // Personalised welcome
   useEffect(() => {
@@ -273,6 +288,15 @@ export default function FloatingChatbot(): React.JSX.Element {
     }
   }, [input, isTyping, history, connStatus, user, urduMode, stream]);
 
+  // Send pending query once chat is open and sendMessage is ready
+  useEffect(() => {
+    if (pendingQuery && isOpen && !isTyping) {
+      const q = pendingQuery;
+      setPendingQuery(null);
+      sendMessage(q);
+    }
+  }, [pendingQuery, isOpen, isTyping, sendMessage]);
+
   const clearChat = useCallback(() => {
     setMessages([{
       id: nextId.current++,
@@ -309,6 +333,7 @@ export default function FloatingChatbot(): React.JSX.Element {
         role="dialog"
         aria-label="Physical AI Textbook Chatbot"
         aria-modal="true"
+        data-chatbot="true"
       >
         {/* Header */}
         <div className={styles.panelHeader}>

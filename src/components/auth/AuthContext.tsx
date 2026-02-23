@@ -4,7 +4,7 @@
  */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-import { API_BASE } from '@site/src/apiConfig';
+import { API_BASE } from '@site/src/config/apiConfig';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -82,13 +82,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await fetch(`${API_BASE}/auth/login`, {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
+    console.log('[login] status:', res.status, res.statusText);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+      console.log('[login] error body:', err);
       const msg = res.status === 404
         ? 'Server is starting up, please try again in a moment.'
         : (err.detail || 'Login failed');
@@ -98,19 +100,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [handleAuthResponse]);
 
   const signup = useCallback(async (data: SignupPayload) => {
-    const res = await fetch(`${API_BASE}/auth/signup`, {
+    const url = `${API_BASE}/api/auth/signup`;
+    console.log('[signup] POST', url, data);
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
+    console.log('[signup] status:', res.status, res.statusText);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+      console.log('[signup] error body:', err);
       const msg = res.status === 404
         ? 'Server is starting up, please try again in a moment.'
         : (err.detail || 'Signup failed');
       throw new Error(msg);
     }
-    handleAuthResponse(await res.json());
+    const response = await res.json();
+    console.log('[signup] success response:', response);
+    handleAuthResponse(response);
   }, [handleAuthResponse]);
 
   const logout = useCallback(() => {
@@ -121,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = useCallback(async (patch: Partial<Pick<UserProfile, 'background_level' | 'field_of_interest' | 'learning_goals'>>) => {
     if (!token) return;
-    const res = await fetch(`${API_BASE}/auth/profile`, {
+    const res = await fetch(`${API_BASE}/api/auth/profile`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

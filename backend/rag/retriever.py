@@ -47,7 +47,7 @@ def _get_pipeline():
 def _get_client() -> QdrantClient:
     if not QDRANT_URL or not QDRANT_API_KEY:
         raise RuntimeError("QDRANT_URL and QDRANT_API_KEY must be set in .env")
-    return QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=30)
+    return QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=8)
 
 
 # ── Search ────────────────────────────────────────────────────────────────────
